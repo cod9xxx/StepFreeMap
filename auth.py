@@ -18,6 +18,8 @@ def init_users_db():
                      name
                      TEXT,
                      password_hash
+                     TEXT,
+                     gender
                      TEXT
                  )''')
     conn.commit()
@@ -27,7 +29,7 @@ def init_users_db():
 def get_all_users_config():
     conn = sqlite3.connect(DB_USERS)
     c = conn.cursor()
-    c.execute("SELECT username, name, password_hash FROM users")
+    c.execute("SELECT username, name, password_hash, gender FROM users")
     rows = c.fetchall()
     conn.close()
 
@@ -35,12 +37,13 @@ def get_all_users_config():
     for row in rows:
         config['credentials']['usernames'][row[0]] = {
             'name': row[1],
-            'password': row[2]
+            'password': row[2],
+            'gender': row[3]
         }
     return config
 
 
-def register_new_user(username, name, password):
+def register_new_user(username, name, password, gender):
     if not username or not password:
         return False, "Логин и пароль не могут быть пустыми"
 
@@ -49,7 +52,7 @@ def register_new_user(username, name, password):
     conn = sqlite3.connect(DB_USERS)
     c = conn.cursor()
     try:
-        c.execute("INSERT INTO users VALUES (?, ?, ?)", (username, name, hashed_pw))
+        c.execute("INSERT INTO users VALUES (?, ?, ?, ?)", (username, name, hashed_pw, gender))
         conn.commit()
         return True, "Регистрация успешна!"
     except sqlite3.IntegrityError:
@@ -78,6 +81,7 @@ def show_auth_page():
             st.session_state["authenticated"] = True
             st.session_state["username"] = username
             st.session_state["name"] = name
+            st.session_state["gender"] = config['credentials']['usernames'][username]['gender']
             st.rerun()
         elif authentication_status is False:
             st.error("Неверный логин или пароль")
@@ -87,11 +91,12 @@ def show_auth_page():
         with st.form("reg_form", clear_on_submit=True):
             new_user = st.text_input("Логин (email или ник)")
             new_name = st.text_input("Имя")
+            new_gender = st.selectbox("Ваш пол", ["Мужской", "Женский", "Другой"])
             new_pw = st.text_input("Пароль", type="password")
             submit = st.form_submit_button("Зарегистрироваться")
 
             if submit:
-                success, message = register_new_user(new_user, new_name, new_pw)
+                success, message = register_new_user(new_user, new_name, new_pw, new_gender)
                 if success:
                     st.success(message)
                     st.info("Теперь вы можете войти во вкладке 'Вход'")
