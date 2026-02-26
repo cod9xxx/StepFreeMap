@@ -5,7 +5,6 @@ from streamlit_authenticator.utilities.hasher import Hasher
 
 DB_USERS = "users.db"
 
-
 def init_users_db():
     conn = sqlite3.connect(DB_USERS)
     c = conn.cursor()
@@ -60,45 +59,38 @@ def register_new_user(username, name, password, gender):
     finally:
         conn.close()
 
+st.set_page_config(page_title="StepFree Auth", layout='centered')
+init_users_db()
+config = get_all_users_config()
+authenticator = stauth.Authenticate(config['credentials'], 'stepfree_cookie', 'auth_key')
 
-def show_auth_page():
-    init_users_db()
-    config = get_all_users_config()
+tab1, tab2 = st.tabs(["Вход", "Регистрация"])
 
-    authenticator = stauth.Authenticate(
-        config['credentials'],
-        'stepfree_session',
-        'signature_key_123',
-        cookie_expiry_days=1
-    )
+with tab1:
+    name, authentication_status, username = authenticator.login('main')
 
-    tab1, tab2 = st.tabs(["Вход", "Регистрация"])
+    if authentication_status:
+        st.session_state["authenticated"] = True
+        st.session_state["username"] = username
+        st.session_state["name"] = name
+        st.session_state["gender"] = config['credentials']['usernames'][username]['gender']
+        st.rerun()
+    elif authentication_status is False:
+        st.error("Неверный логин или пароль")
 
-    with tab1:
-        name, authentication_status, username = authenticator.login('main')
+with tab2:
+    st.subheader("Создать новый аккаунт")
+    with st.form("reg_form", clear_on_submit=True):
+        new_user = st.text_input("Логин (email или ник)")
+        new_name = st.text_input("Имя")
+        new_gender = st.selectbox("Ваш пол", ["Мужской", "Женский", "Другой"])
+        new_pw = st.text_input("Пароль", type="password")
+        submit = st.form_submit_button("Зарегистрироваться")
 
-        if authentication_status:
-            st.session_state["authenticated"] = True
-            st.session_state["username"] = username
-            st.session_state["name"] = name
-            st.session_state["gender"] = config['credentials']['usernames'][username]['gender']
-            st.rerun()
-        elif authentication_status is False:
-            st.error("Неверный логин или пароль")
-
-    with tab2:
-        st.subheader("Создать новый аккаунт")
-        with st.form("reg_form", clear_on_submit=True):
-            new_user = st.text_input("Логин (email или ник)")
-            new_name = st.text_input("Имя")
-            new_gender = st.selectbox("Ваш пол", ["Мужской", "Женский", "Другой"])
-            new_pw = st.text_input("Пароль", type="password")
-            submit = st.form_submit_button("Зарегистрироваться")
-
-            if submit:
-                success, message = register_new_user(new_user, new_name, new_pw, new_gender)
-                if success:
-                    st.success(message)
-                    st.info("Теперь вы можете войти во вкладке 'Вход'")
-                else:
-                    st.error(message)
+        if submit:
+            success, message = register_new_user(new_user, new_name, new_pw, new_gender)
+            if success:
+                st.success(message)
+                st.info("Теперь вы можете войти во вкладке 'Вход'")
+            else:
+                st.error(message)

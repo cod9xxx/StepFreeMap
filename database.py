@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_NAME = "locations.db"
+DB_NAME = "reviews.db"
 
 
 def init_all_dbs():

@@ -1,13 +1,12 @@
 import streamlit as st
-from auth import show_auth_page
-from profile import show_profile_page
 
-st.set_page_config(page_title="StepFree Map", layout='centered')
+login_page = st.Page("auth.py", title="Вход в систему")
+map_page = st.Page("map.py", title="Интерактивная карта")
+profile_page = st.Page("profile.py", title="Личный кабинет")
 
-if "authenticated" not in st.session_state:
-    st.session_state["authenticated"] = False
-
-if not st.session_state["authenticated"]:
-    show_auth_page()
+if st.session_state.get("authenticated"):
+    pg = st.navigation([map_page, profile_page])
 else:
-    show_profile_page()
+    pg = st.navigation([login_page])
+
+pg.run()

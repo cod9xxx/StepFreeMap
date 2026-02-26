@@ -521,9 +521,6 @@ if not osm_loaded():
 
     st.success("OSM данные загружены в базу.")
 
-
-# --- ОСНОВНОЕ ПРИЛОЖЕНИЕ STREAMLIT ---
-
 st.set_page_config(layout="wide")
 
 st.title("Карта Ростова-на-Дону (OpenStreetMap)")
