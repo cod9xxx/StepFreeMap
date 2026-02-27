@@ -1,7 +1,6 @@
 import streamlit as st
 from database import get_user_stats
 
-
 if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
     st.error("Пожалуйста, сначала авторизуйтесь на главной странице")
     st.stop()

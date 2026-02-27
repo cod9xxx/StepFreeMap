@@ -2,7 +2,7 @@ import random
 import sqlite3
 
 def add_test_data(current_user):
-    conn = sqlite3.connect('reviews.db.db')
+    conn = sqlite3.connect('reviews.db')
     c = conn.cursor()
 
     # 1. Создаем несколько меток для текущего пользователя, если их еще нет
