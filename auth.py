@@ -59,6 +59,8 @@ def register_new_user(username, name, password, gender):
     finally:
         conn.close()
 
+
+# ui
 st.set_page_config(page_title="StepFree Auth", layout='centered')
 init_users_db()
 config = get_all_users_config()

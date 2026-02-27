@@ -1,7 +1,8 @@
 import sqlite3
 
-DB_NAME = "reviews.db"
+# databases for reviews in profile and profile itself
 
+DB_NAME = "reviews.db"
 
 def init_all_dbs():
     conn = sqlite3.connect(DB_NAME)

@@ -2,21 +2,17 @@ import streamlit as st
 from database import get_user_stats
 
 if "authenticated" not in st.session_state or not st.session_state["authenticated"]:
-    st.error("Пожалуйста, сначала авторизуйтесь на главной странице")
+    st.error("Сначала авторизуйтесь на главной странице")
     st.stop()
 
 username = st.session_state.get("username")
 name = st.session_state.get("name", username)
 gender = st.session_state.get("gender", "Не указан")
 
-avatar_map = {"Мужской": "👨", "Женский": "👩", "Другой": "👤"}
-avatar = avatar_map.get(gender, "👤")
-
-st.title(f"{avatar} Профиль: {name}")
+st.title(f"Профиль: {name}")
 
 rating, reviews_list = get_user_stats(username)
 
-# Верхняя панель с метриками
 col1, col2 = st.columns(2)
 with col1:
     st.metric(label="Ваш рейтинг доверия", value=f"{rating}")
