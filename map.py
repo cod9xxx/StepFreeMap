@@ -452,6 +452,9 @@ if "route_spoken" not in st.session_state:
 if 'route_json' not in st.session_state:
     st.session_state.route_json = None
 
+if "intro_ready" not in st.session_state:
+    st.session_state.intro_ready = True
+
 if 'osm_ramp_locations' not in st.session_state:
     st.session_state.osm_ramp_locations = []
 if 'osm_wc_locations' not in st.session_state:
@@ -831,6 +834,10 @@ if not osm_loaded():
 import speech_recognition as sr
 import tempfile
 
+if st.session_state.get("intro_ready"):
+    st.markdown("### 🔊 Инструкция по голосовому вводу")
+    st.audio("audio_1.mp3", autoplay=True)
+
 st.markdown("### Голосовой ввод")
 
 audio_file = st.audio_input("Запишите голос")
@@ -861,7 +868,7 @@ if audio_file is not None:
             st.session_state.voice_mode = True
         except:
             st.error("Не удалось распознать речь")
-
+    st.session_state.intro_ready = False
 if st.session_state.spoken_text and not st.session_state.voice_processed:
     st.markdown("### Вы сказали:")
     st.info(st.session_state.spoken_text)
